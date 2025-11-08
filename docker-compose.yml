@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: awesomepizza-db
+    restart: always
+    environment:
+      POSTGRES_USER: awesomepizza_admin
+      POSTGRES_PASSWORD: awesomepizza_pass
+      POSTGRES_DB: awesomepizza_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./volumes/database/postgres/data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U awesomepizza_admin -d awesomepizza_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  db_data:
+
