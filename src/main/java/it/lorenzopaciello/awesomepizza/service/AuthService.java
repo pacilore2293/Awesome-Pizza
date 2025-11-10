@@ -6,8 +6,8 @@ import it.lorenzopaciello.awesomepizza.exception.ErrorCode;
 import it.lorenzopaciello.awesomepizza.exception.custom.ConflictException;
 import it.lorenzopaciello.awesomepizza.model.RefreshToken;
 import it.lorenzopaciello.awesomepizza.model.Role;
-import it.lorenzopaciello.awesomepizza.model.UserAuth;
-import it.lorenzopaciello.awesomepizza.repository.UserAuthRepository;
+import it.lorenzopaciello.awesomepizza.model.User;
+import it.lorenzopaciello.awesomepizza.repository.UserRepository;
 import it.lorenzopaciello.awesomepizza.security.service.CustomUserDetailsService;
 import it.lorenzopaciello.awesomepizza.service.interfaces.AuthServiceInterface;
 import it.lorenzopaciello.awesomepizza.service.interfaces.JwtServiceInterface;
@@ -19,9 +19,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -30,7 +30,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthService implements AuthServiceInterface {
 
-    private final UserAuthRepository userAuthRepository;
+    private final UserRepository userAuthRepository;
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
     private final JwtServiceInterface jwtService;
@@ -42,11 +42,16 @@ public class AuthService implements AuthServiceInterface {
     private long refreshExpirationMs;
 
     @Override
+    @Transactional
     public Map<String, String> login(LoginRequestDto request, HttpServletResponse response) {
+
+        User user = (User) userDetailsService.loadUserByUsername(request.getUsername());
+        user.setEnabled(true);
+        this.userAuthRepository.save(user);
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-        UserDetails user = userDetailsService.loadUserByUsername(request.getUsername());
+        //UserDetails userDeatils = userDetailsService.loadUserByUsername(request.getUsername());
         String accessToken = jwtService.generateAccessToken(user);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
 
@@ -66,12 +71,12 @@ public class AuthService implements AuthServiceInterface {
     }
 
     @Override
-    public UserAuth registerUser(RegistrationRequestDto registrationRequestDto) {
+    public User registerUser(RegistrationRequestDto registrationRequestDto) {
         if (userAuthRepository.findByUsername(registrationRequestDto.getUsername()).isPresent()) {
             throw new ConflictException(ErrorCode.USER_ALREADY_EXISTS_USERNAME);
         }
 
-        UserAuth user = UserAuth.builder()
+        User user = User.builder()
                 .username(registrationRequestDto.getUsername())
                 .password(passwordEncoder.encode(registrationRequestDto.getPassword()))
                 .roles(new HashSet<>())

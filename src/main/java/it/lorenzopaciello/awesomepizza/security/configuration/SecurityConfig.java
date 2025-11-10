@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/logout", "/api/pizzas", "/api/order").permitAll()
+                        .requestMatchers(SecurityWhitelist.PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
 
                         // solo ADMIN può creare nuovi utenti (AL MOMENTO)
                         .requestMatchers(HttpMethod.POST, "/api/auth/register").hasRole("ADMIN")

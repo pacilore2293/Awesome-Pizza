@@ -1,6 +1,5 @@
 package it.lorenzopaciello.awesomepizza.service.interfaces;
 
-import it.lorenzopaciello.awesomepizza.model.UserAuth;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;

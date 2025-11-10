@@ -137,8 +137,8 @@ INSERT INTO role (id, name) VALUES
     (2, 'ROLE_PIZZAIOLO')
 ON CONFLICT DO NOTHING;
 
-INSERT INTO user_auth (username, password) VALUES
-('admin', '$2a$10$ohYCg1ukf6XXPQYITnHQaechYHH.6Q8HlJomtdu2Lu/ZAsxCt90wG') -- admin_pass
+INSERT INTO user_auth (username, password, enabled) VALUES
+('admin', '$2a$10$ohYCg1ukf6XXPQYITnHQaechYHH.6Q8HlJomtdu2Lu/ZAsxCt90wG', false) -- admin_pass
 ON CONFLICT DO NOTHING;
 
 INSERT INTO user_auth_role (fk_user_auth_id, fk_role_id) VALUES (1, 1)

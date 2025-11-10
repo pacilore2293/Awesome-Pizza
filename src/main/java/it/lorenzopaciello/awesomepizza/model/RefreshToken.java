@@ -3,8 +3,6 @@ package it.lorenzopaciello.awesomepizza.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
-
 @Entity
 @Getter
 @Setter
@@ -23,6 +21,6 @@ public class RefreshToken {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_user_auth_id")
-    private UserAuth user;
+    private User user;
 }
 

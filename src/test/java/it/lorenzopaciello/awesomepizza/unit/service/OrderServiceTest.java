@@ -1,5 +1,6 @@
 package it.lorenzopaciello.awesomepizza.unit.service;
 
+import it.lorenzopaciello.awesomepizza.exception.ErrorCode;
 import it.lorenzopaciello.awesomepizza.exception.custom.NotFoundException;
 import it.lorenzopaciello.awesomepizza.model.Order;
 import it.lorenzopaciello.awesomepizza.controller.dto.request.OrderRequestDto;
@@ -84,7 +85,7 @@ public class OrderServiceTest {
 
             when(searchService.findPizzaById(requestBody.getOrder().get(0).getIdPizza())).thenReturn(PizzaUtils.getSinglePizzaId1());
             when(searchService.findPizzaById(requestBody.getOrder().get(1).getIdPizza())).thenReturn(PizzaUtils.getSinglePizzaId2());
-            when(searchService.findPizzaById(requestBody.getOrder().get(2).getIdPizza())).thenThrow(new NotFoundException("Pizza non trovata"));
+            when(searchService.findPizzaById(requestBody.getOrder().get(2).getIdPizza())).thenThrow(new NotFoundException(ErrorCode.PIZZA_NOT_FOUND_ID));
 
             assertThrows(NotFoundException.class, () -> orderService.createOrder(requestBody));
 

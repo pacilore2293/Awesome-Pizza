@@ -3,9 +3,9 @@ package it.lorenzopaciello.awesomepizza.service;
 import it.lorenzopaciello.awesomepizza.exception.ErrorCode;
 import it.lorenzopaciello.awesomepizza.exception.custom.NotFoundException;
 import it.lorenzopaciello.awesomepizza.model.RefreshToken;
-import it.lorenzopaciello.awesomepizza.model.UserAuth;
+import it.lorenzopaciello.awesomepizza.model.User;
 import it.lorenzopaciello.awesomepizza.repository.RefreshTokenRepository;
-import it.lorenzopaciello.awesomepizza.repository.UserAuthRepository;
+import it.lorenzopaciello.awesomepizza.repository.UserRepository;
 import it.lorenzopaciello.awesomepizza.service.interfaces.RefreshTokenServiceInterface;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,14 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class RefreshTokenService implements RefreshTokenServiceInterface {
 
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserAuthRepository userRepository;
+    private final UserRepository userRepository;
     private final JwtService jwtService;
 
     @Override
     @Transactional
     public RefreshToken createRefreshToken(String username) {
 
-        UserAuth user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND_USERNAME));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND_USERNAME));
 
         refreshTokenRepository.deleteByUser(user);
 

@@ -46,15 +46,21 @@ public class ExceptionRestHandler {
 
     //----- SPRING SECURITY -----//
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
+    public ResponseEntity<ResponseErrorDto> handleBadCredentials(BadCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of(ErrorCode.AUTH_INVALID_CREDENTIALS.getCode(), this.messageSource.getMessage(ErrorCode.AUTH_INVALID_CREDENTIALS.getMessageKey(), null, LocaleContextHolder.getLocale())));
+                .body(ResponseErrorDto.builder()
+                        .code(ErrorCode.AUTH_INVALID_CREDENTIALS.getCode())
+                        .message(this.messageSource.getMessage(ErrorCode.AUTH_INVALID_CREDENTIALS.getMessageKey(), null, LocaleContextHolder.getLocale()))
+                        .build());
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleUserNotFound(UsernameNotFoundException ex) {
+    public ResponseEntity<ResponseErrorDto> handleUserNotFound(UsernameNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of(ErrorCode.USER_NOT_FOUND_USERNAME.getCode(), this.messageSource.getMessage(ErrorCode.USER_NOT_FOUND_USERNAME.getMessageKey(), null, LocaleContextHolder.getLocale())));
+                .body(ResponseErrorDto.builder()
+                        .code(ErrorCode.USER_NOT_FOUND_USERNAME.getCode())
+                        .message(this.messageSource.getMessage(ErrorCode.USER_NOT_FOUND_USERNAME.getMessageKey(), null, LocaleContextHolder.getLocale()))
+                        .build());
     }
 
     @ExceptionHandler(LockedException.class)

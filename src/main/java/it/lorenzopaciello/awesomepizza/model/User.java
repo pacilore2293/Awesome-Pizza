@@ -17,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserAuth implements UserDetails {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,11 +37,24 @@ public class UserAuth implements UserDetails {
     )
     private Set<Role> roles = new HashSet<>();
 
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled = true;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .toList();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @PrePersist
+    public void prePersist() {
+       this.enabled = false;
     }
 
 }
