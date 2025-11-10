@@ -1,5 +1,6 @@
 package it.lorenzopaciello.awesomepizza.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -24,6 +25,7 @@ public class PizzaOrder {
     private Pizza pizza;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     @JoinColumn(name = "fk_order_id", nullable = false)
     private Order order;
 

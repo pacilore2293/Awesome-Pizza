@@ -1,5 +1,6 @@
 package it.lorenzopaciello.awesomepizza.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Check;
@@ -36,6 +37,7 @@ public class Order {
     private UserGuest guest;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private Set<PizzaOrder> pizzaOrders = new HashSet<>();
 
     @CreatedDate

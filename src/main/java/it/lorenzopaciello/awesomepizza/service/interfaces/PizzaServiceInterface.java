@@ -1,10 +1,9 @@
 package it.lorenzopaciello.awesomepizza.service.interfaces;
 
-import it.lorenzopaciello.awesomepizza.model.projection.PizzaProjection;
-import org.springframework.http.ResponseEntity;
+import it.lorenzopaciello.awesomepizza.controller.dto.response.PizzaResponseDto;
 
 import java.util.List;
 
 public interface PizzaServiceInterface {
-    public List<PizzaProjection> getAllPizzas(String language);
+    public List<PizzaResponseDto> getAllPizzas();
 }

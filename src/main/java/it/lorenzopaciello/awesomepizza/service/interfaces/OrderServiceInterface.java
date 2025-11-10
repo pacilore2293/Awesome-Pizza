@@ -2,8 +2,8 @@ package it.lorenzopaciello.awesomepizza.service.interfaces;
 
 
 import it.lorenzopaciello.awesomepizza.model.Order;
-import it.lorenzopaciello.awesomepizza.model.dto.request.OrderDto;
+import it.lorenzopaciello.awesomepizza.controller.dto.request.OrderRequestDto;
 
 public interface OrderServiceInterface {
-    public Order createOrder(OrderDto orderDto);
+    public Order createOrder(OrderRequestDto orderRequestDto);
 }

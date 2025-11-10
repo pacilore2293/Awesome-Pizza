@@ -1,12 +1,17 @@
 package it.lorenzopaciello.awesomepizza.exception.custom;
 
+import it.lorenzopaciello.awesomepizza.exception.ErrorCode;
+import lombok.Getter;
+
+@Getter
 public class NotFoundException extends RuntimeException{
-    public NotFoundException(String message) {
-        super(message);
+
+    private final ErrorCode errorCode;
+
+    public NotFoundException(ErrorCode errorCode) {
+        super(errorCode.name());
+        this.errorCode = errorCode;
     }
 
-    public NotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }
 

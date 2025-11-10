@@ -1,7 +1,7 @@
 package it.lorenzopaciello.awesomepizza.unit.service;
 
 import it.lorenzopaciello.awesomepizza.model.Pizza;
-import it.lorenzopaciello.awesomepizza.model.projection.PizzaProjection;
+import it.lorenzopaciello.awesomepizza.controller.dto.response.PizzaResponseDto;
 import it.lorenzopaciello.awesomepizza.repository.PizzaRepository;
 import it.lorenzopaciello.awesomepizza.service.PizzaService;
 import it.lorenzopaciello.awesomepizza.unit.utils.PizzaUtils;
@@ -40,7 +40,7 @@ public class PizzaServiceTest {
 
             when(pizzaRepository.findAllByAvailableIsTrue()).thenReturn(pizzas);
 
-            List<PizzaProjection> allPizzas = pizzaService.getAllPizzas("it");
+            List<PizzaResponseDto> allPizzas = pizzaService.getAllPizzas();
 
             assertEquals(3, allPizzas.size());
 
@@ -55,7 +55,7 @@ public class PizzaServiceTest {
 
             when(pizzaRepository.findAllByAvailableIsTrue()).thenReturn(List.of());
 
-            List<PizzaProjection> allPizzas = pizzaService.getAllPizzas("it");
+            List<PizzaResponseDto> allPizzas = pizzaService.getAllPizzas();
 
             assertEquals(0, allPizzas.size());
 
@@ -74,7 +74,7 @@ public class PizzaServiceTest {
 
             PizzaService brokenService = new PizzaService(null);
 
-            assertThrows(NullPointerException.class, () -> brokenService.getAllPizzas("it"));
+            assertThrows(NullPointerException.class, brokenService::getAllPizzas);
         }
     }
 

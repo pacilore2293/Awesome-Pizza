@@ -2,12 +2,13 @@ package it.lorenzopaciello.awesomepizza.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.Instant;
-
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "user_auth")
@@ -16,32 +17,31 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
-public class UserAuth {
+public class UserAuth implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Column(unique = true, nullable = false)
+    private String username;
 
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
+    @Column(nullable = false)
+    private String password;
 
-    @Column(name = "email", nullable = false)
-    private String email;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_auth_role",
+            joinColumns = @JoinColumn(name = "fk_user_auth_id"),
+            inverseJoinColumns = @JoinColumn(name = "fk_role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
 
-    @Column(name = "telephone", nullable = false)
-    private String telephone;
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .toList();
+    }
 
 }
-

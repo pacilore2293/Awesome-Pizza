@@ -1,6 +1,6 @@
 package it.lorenzopaciello.awesomepizza.controller;
 
-import it.lorenzopaciello.awesomepizza.model.projection.PizzaProjection;
+import it.lorenzopaciello.awesomepizza.controller.dto.response.PizzaResponseDto;
 import it.lorenzopaciello.awesomepizza.service.PizzaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -24,7 +24,7 @@ public class PizzaController {
     }
 
     @GetMapping(value = "/pizzas", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<PizzaProjection>> getAllPizzas(Locale locale) {
-        return ResponseEntity.ok(pizzaService.getAllPizzas(locale.getLanguage()));
+    public ResponseEntity<List<PizzaResponseDto>> getAllPizzas() {
+        return ResponseEntity.ok(pizzaService.getAllPizzas());
     }
 }

@@ -131,3 +131,15 @@ INSERT INTO pizza_ingredient (fk_pizza_id, fk_ingredient_id, quantity) VALUES
 (10, 19, 2.0), -- Uova
 (10, 20, 25.0) -- Pancetta
 ON CONFLICT DO NOTHING;
+
+INSERT INTO role (id, name) VALUES
+    (1, 'ROLE_ADMIN'),
+    (2, 'ROLE_PIZZAIOLO')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO user_auth (username, password) VALUES
+('admin', '$2a$10$ohYCg1ukf6XXPQYITnHQaechYHH.6Q8HlJomtdu2Lu/ZAsxCt90wG') -- admin_pass
+ON CONFLICT DO NOTHING;
+
+INSERT INTO user_auth_role (fk_user_auth_id, fk_role_id) VALUES (1, 1)
+ON CONFLICT DO NOTHING;

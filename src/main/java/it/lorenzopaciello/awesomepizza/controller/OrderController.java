@@ -1,17 +1,15 @@
 package it.lorenzopaciello.awesomepizza.controller;
 
 import it.lorenzopaciello.awesomepizza.model.Order;
-import it.lorenzopaciello.awesomepizza.model.dto.request.OrderDto;
-import it.lorenzopaciello.awesomepizza.model.projection.PizzaProjection;
+import it.lorenzopaciello.awesomepizza.controller.dto.request.OrderRequestDto;
 import it.lorenzopaciello.awesomepizza.service.OrderService;
-import it.lorenzopaciello.awesomepizza.service.PizzaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Locale;
 
 @RestController("orderController")
@@ -26,7 +24,8 @@ public class OrderController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Order> createOrder(@RequestBody @Valid OrderDto order, Locale locale) {
-        return ResponseEntity.ok(this.orderService.createOrder(order));
+    public ResponseEntity<String> createOrder(@RequestBody @Valid OrderRequestDto orderRequestDto, Locale locale) {
+        Order order = this.orderService.createOrder(orderRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(order.getCode());
     }
 }

@@ -1,5 +1,6 @@
 package it.lorenzopaciello.awesomepizza.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -43,6 +44,7 @@ public class Pizza {
     private Boolean available;
 
     @OneToMany(mappedBy = "pizza", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private Set<PizzaIngredient> pizzaIngredients = new HashSet<>();
 
     @CreatedDate

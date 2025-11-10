@@ -2,7 +2,7 @@ package it.lorenzopaciello.awesomepizza.unit.service;
 
 import it.lorenzopaciello.awesomepizza.exception.custom.NotFoundException;
 import it.lorenzopaciello.awesomepizza.model.Order;
-import it.lorenzopaciello.awesomepizza.model.dto.request.OrderDto;
+import it.lorenzopaciello.awesomepizza.controller.dto.request.OrderRequestDto;
 import it.lorenzopaciello.awesomepizza.repository.OrderRepository;
 import it.lorenzopaciello.awesomepizza.service.OrderService;
 import it.lorenzopaciello.awesomepizza.service.SearchService;
@@ -39,7 +39,7 @@ public class OrderServiceTest {
         @DisplayName("Dovrebbe restituire l'ordine creato - 1 pizza")
         void shouldReturnOrderCode_whenAllPizzasAvailable() {
 
-            OrderDto requestBody = OrderUtils.getValidOrder1PizzaDto();
+            OrderRequestDto requestBody = OrderUtils.getValidOrder1PizzaDto();
 
             when(searchService.findPizzaById(requestBody.getOrder().get(0).getIdPizza())).thenReturn(PizzaUtils.getSinglePizzaId1());
             when(orderRepository.save(any())).thenReturn(OrderUtils.getOrderSingleEntity());
@@ -56,7 +56,7 @@ public class OrderServiceTest {
         @DisplayName("Dovrebbe restituire l'ordine creato - 2 pizze")
         void shouldReturnOrderCode_when2PizzasAvailable() {
 
-            OrderDto requestBody = OrderUtils.getValidOrder2PizzaDto();
+            OrderRequestDto requestBody = OrderUtils.getValidOrder2PizzaDto();
 
             when(searchService.findPizzaById(requestBody.getOrder().get(0).getIdPizza())).thenReturn(PizzaUtils.getSinglePizzaId1());
             when(searchService.findPizzaById(requestBody.getOrder().get(1).getIdPizza())).thenReturn(PizzaUtils.getSinglePizzaId2());
@@ -80,7 +80,7 @@ public class OrderServiceTest {
         @DisplayName("Dovrebbe sollevare NotFoundExcpetion")
         void shouldReturnOrderCode_whenAllPizzasAvailable() {
 
-            OrderDto requestBody = OrderUtils.getValidOrder3Pizza1NotExistDto();
+            OrderRequestDto requestBody = OrderUtils.getValidOrder3Pizza1NotExistDto();
 
             when(searchService.findPizzaById(requestBody.getOrder().get(0).getIdPizza())).thenReturn(PizzaUtils.getSinglePizzaId1());
             when(searchService.findPizzaById(requestBody.getOrder().get(1).getIdPizza())).thenReturn(PizzaUtils.getSinglePizzaId2());

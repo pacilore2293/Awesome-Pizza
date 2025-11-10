@@ -2,7 +2,7 @@ package it.lorenzopaciello.awesomepizza.service;
 
 import it.lorenzopaciello.awesomepizza.model.Order;
 import it.lorenzopaciello.awesomepizza.model.Pizza;
-import it.lorenzopaciello.awesomepizza.model.dto.request.OrderDto;
+import it.lorenzopaciello.awesomepizza.controller.dto.request.OrderRequestDto;
 import it.lorenzopaciello.awesomepizza.repository.OrderRepository;
 import it.lorenzopaciello.awesomepizza.service.interfaces.OrderServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +22,13 @@ public class OrderService implements OrderServiceInterface {
     }
 
     @Override
-    public Order createOrder(OrderDto orderDto) {
+    public Order createOrder(OrderRequestDto orderRequestDto) {
         Order newOrder = new Order();
-        orderDto.getOrder().forEach(order -> {
+        orderRequestDto.getOrder().forEach(order -> {
             Pizza pizza = this.searchService.findPizzaById(order.getIdPizza());
             newOrder.addPizza(pizza, order.getQuantity());
         });
-        newOrder.createGuestUser(orderDto.getName(), orderDto.getLastName(), orderDto.getEmail(), orderDto.getPhone());
+        newOrder.createGuestUser(orderRequestDto.getName(), orderRequestDto.getLastName(), orderRequestDto.getEmail(), orderRequestDto.getPhone());
         return this.orderRepository.save(newOrder);
     }
 }
