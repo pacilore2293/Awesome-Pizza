@@ -2,6 +2,7 @@ package it.lorenzopaciello.awesomepizza.integration.controller.auth.register;
 
 import it.lorenzopaciello.awesomepizza.integration.AbstractIntegrationTest;
 import it.lorenzopaciello.awesomepizza.integration.controller.auth.shared.LoginUseCase;
+import it.lorenzopaciello.awesomepizza.integration.controller.auth.shared.RegisterUseCase;
 import it.lorenzopaciello.awesomepizza.model.RefreshToken;
 import it.lorenzopaciello.awesomepizza.model.User;
 import it.lorenzopaciello.awesomepizza.repository.RefreshTokenRepository;
@@ -28,11 +29,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class RegisterSuccessIT extends AbstractIntegrationTest {
 
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private LoginUseCase loginUseCase;
     @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
+    private RegisterUseCase registerUseCase;
 
     @Container
     protected static final PostgreSQLContainer<?> postgres =
@@ -52,30 +51,12 @@ public class RegisterSuccessIT extends AbstractIntegrationTest {
     @DisplayName("Registrazione nuovo utente pizzaiolo")
     void registerNewUserPizzaiolo() throws Exception {
         ResultActions result = this.loginUseCase.loginRequest("admin", "admin_pass", null, this.mockMvc);
-        this.loginUseCase.loginSuccessAssertions(result);
+        this.loginUseCase.loginSuccessAssertions(result, 1);
         String accessToken = this.loginUseCase.loginSuccessGetToken(result.andReturn());
-        mockMvc.perform(post("/api/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + accessToken)
-                        .content("""
-                        {
-                            "username": "pizzaiolo",
-                            "password": "pizza_pass",
-                            "role": "ROLE_PIZZAIOLO"
-                        }
-                    """))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.username").value("pizzaiolo"))
-                .andExpect(jsonPath("$.enabled").value(false))
-                .andExpect(jsonPath("$.roles[0].name").value("ROLE_PIZZAIOLO"));
+        ResultActions resultActions = this.registerUseCase.RegisterRequest("pizzaiolo1", "test_prova", "ROLE_PIZZAIOLO", accessToken, null, this.mockMvc);
+        this.registerUseCase.registerSuccessAssertions(resultActions, "pizzaiolo1", "ROLE_PIZZAIOLO");
 
-        User newUser = userRepository.findByUsername("pizzaiolo").orElseThrow(() -> new AssertionError("L’utente pizzaiolo non è stato creato nel database"));
-        assertFalse(newUser.isEnabled(), "L’utente pizzaiolo deve essere abilitato");
-        assertTrue(newUser.getRoles().stream().anyMatch(r -> r.getName().equals("ROLE_PIZZAIOLO")), "L’utente pizzaiolo deve avere il ruolo ROLE_PIZZAIOLO");
 
-        List<RefreshToken> refreshTokenList = this.refreshTokenRepository.findAll();
-        assertEquals(1, refreshTokenList.size());
     }
 
 }

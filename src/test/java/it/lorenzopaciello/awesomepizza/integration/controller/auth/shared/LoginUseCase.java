@@ -46,7 +46,7 @@ public class LoginUseCase {
                     """.formatted(username, password)));
     }
 
-    public void loginSuccessAssertions(ResultActions resultActions) throws Exception {
+    public void loginSuccessAssertions(ResultActions resultActions, int numRefreshToken) throws Exception {
 
         resultActions
                 .andExpect(status().isOk())
@@ -63,7 +63,7 @@ public class LoginUseCase {
 
         // ✅ Verifica stato del refresh token
         List<RefreshToken> tokens = refreshTokenRepository.findAll();
-        assertEquals(1, tokens.size(), "Deve esserci un solo refresh token nel DB");
+        assertEquals(numRefreshToken, tokens.size(), "Deve esserci un solo refresh token nel DB");
 
         RefreshToken token = tokens.get(0);
         assertEquals(admin.getId(), token.getUser().getId(), "Il token deve appartenere all’utente admin");
