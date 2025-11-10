@@ -58,7 +58,7 @@ public class AuthService implements AuthServiceInterface {
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
                 .httpOnly(true)
                 .secure(false)
-                .path("/api/auth/refresh")
+                .path("/api/auth/logout")
                 .maxAge(refreshExpirationMs)
                 .sameSite("Strict")
                 .build();
@@ -86,5 +86,29 @@ public class AuthService implements AuthServiceInterface {
         user.getRoles().add(role);
 
         return userAuthRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public Boolean logout(String refreshToken, HttpServletResponse response) {
+
+        String username = this.jwtService.extractUsername(refreshToken);
+        User user = (User) this.userDetailsService.loadUserByUsername(username);
+        user.setEnabled(false);
+        this.userAuthRepository.save(user);
+
+        if (refreshToken != null) {
+            refreshTokenService.revokeToken(refreshToken);
+        }
+
+        ResponseCookie clearedCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, clearedCookie.toString());
+
+        return true;
     }
 }

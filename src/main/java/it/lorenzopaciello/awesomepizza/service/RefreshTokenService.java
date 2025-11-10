@@ -43,4 +43,11 @@ public class RefreshTokenService implements RefreshTokenServiceInterface {
         return refreshTokenRepository.save(refreshToken);
     }
 
+    public void revokeToken(String token) {
+        refreshTokenRepository.findByToken(token).ifPresent(rt -> {
+            rt.setRevoked(true);
+            refreshTokenRepository.save(rt);
+        });
+    }
+
 }

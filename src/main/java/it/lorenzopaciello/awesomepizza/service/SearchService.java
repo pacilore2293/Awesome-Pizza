@@ -4,6 +4,7 @@ import it.lorenzopaciello.awesomepizza.exception.ErrorCode;
 import it.lorenzopaciello.awesomepizza.exception.custom.NotFoundException;
 import it.lorenzopaciello.awesomepizza.model.Pizza;
 import it.lorenzopaciello.awesomepizza.model.Role;
+import it.lorenzopaciello.awesomepizza.model.User;
 import it.lorenzopaciello.awesomepizza.repository.PizzaRepository;
 import it.lorenzopaciello.awesomepizza.repository.RoleRepository;
 import it.lorenzopaciello.awesomepizza.service.interfaces.SearchServiceInterface;
@@ -32,5 +33,10 @@ public class SearchService implements SearchServiceInterface {
     public Role findRoleByName(String name) {
         return this.roleRepository.findByName(name).orElseThrow(
                 () -> new NotFoundException(ErrorCode.ROLE_NOT_FOUND_NAME));
+    }
+
+    @Override
+    public User findUserByUsername(String username) {
+        return null;
     }
 }

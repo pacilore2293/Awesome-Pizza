@@ -10,4 +10,5 @@ import java.util.Map;
 public interface AuthServiceInterface {
     public Map<String, String> login(LoginRequestDto authRequestDto, HttpServletResponse response);
     public User registerUser(RegistrationRequestDto registrationRequestDto);
+    public Boolean logout(String refreshToken, HttpServletResponse response);
 }
