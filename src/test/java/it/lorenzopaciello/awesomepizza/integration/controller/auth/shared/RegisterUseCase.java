@@ -26,20 +26,33 @@ public class RegisterUseCase {
 
     public ResultActions RegisterRequest(String username, String password, String role, String accessToken, String language, MockMvc mockMvc) throws Exception {
 
-        return mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("accept-language", language == null ? "it" : language)
-                .header("Authorization", "Bearer " + accessToken)
-                .content("""
+        if(accessToken != null){
+            return mockMvc.perform(post("/api/auth/register")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("accept-language", language == null ? "it" : language)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .content("""
                         {
                             "username": "%s",
                             "password": "%s",
                             "role": "%s"
                         }
                     """.formatted(username, password, role)));
+        }else {
+            return mockMvc.perform(post("/api/auth/register")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("accept-language", language == null ? "it" : language)
+                    .content("""
+                        {
+                            "username": "%s",
+                            "password": "%s",
+                            "role": "%s"
+                        }
+                    """.formatted(username, password, role)));
+        }
     }
 
-    public void registerSuccessAssertions(ResultActions resultActions, String username, String role) throws Exception {
+    public void registerSuccessAssertions(ResultActions resultActions, String username, String role, int numRefreshToken) throws Exception {
 
         resultActions
                 .andExpect(status().isCreated())
@@ -52,8 +65,28 @@ public class RegisterUseCase {
         assertFalse(newUser.isEnabled(), "L’utente deve essere abilitato");
         assertTrue(newUser.getRoles().stream().anyMatch(r -> r.getName().equals(role)), "L’utente deve avere il ruolo ");
 
-        List<RefreshToken> refreshTokenList = this.refreshTokenRepository.findAll();
-        assertEquals(1, refreshTokenList.size());
+        List<RefreshToken> refreshTokenList = this.refreshTokenRepository.findByUserAndRevokedFalse(newUser);
+        assertEquals(numRefreshToken, refreshTokenList.size());
+    }
+
+    public void registerErrorNotPermissionAssertions(ResultActions resultActions, String username, String role, int numRefreshToken) throws Exception {
+
+        resultActions
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value("AUTH_006"));
+
+        userRepository.findByUsername(username).orElseThrow(() -> new AssertionError("L’utente non è stato creato nel database"));
+    }
+
+    public void registerErrorNotAuthAssertions(ResultActions resultActions, String username, String role, int numRefreshToken) throws Exception {
+
+        resultActions
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value("AUTH_003"));
+
+        userRepository.findByUsername(username).orElseThrow(() -> new AssertionError("L’utente non è stato creato nel database"));
     }
 
 }

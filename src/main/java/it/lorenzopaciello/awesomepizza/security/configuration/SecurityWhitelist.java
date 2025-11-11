@@ -10,7 +10,10 @@ public class SecurityWhitelist {
             "/api/auth/logout",
             "/api/pizzas",
             "/api/order",
-            "/api/order/detail"
+            "/api/order/detail",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
     );
 
 }

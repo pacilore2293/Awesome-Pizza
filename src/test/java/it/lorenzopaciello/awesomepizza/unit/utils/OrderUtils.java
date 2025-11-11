@@ -2,6 +2,7 @@ package it.lorenzopaciello.awesomepizza.unit.utils;
 
 import it.lorenzopaciello.awesomepizza.model.Order;
 import it.lorenzopaciello.awesomepizza.controller.dto.request.OrderRequestDto;
+import it.lorenzopaciello.awesomepizza.model.UserGuest;
 
 import java.util.List;
 
@@ -12,6 +13,10 @@ public class OrderUtils {
         return Order.builder()
                 .id(1L)
                 .code("EXAMPLE_CODE")
+                .guest(UserGuest.builder()
+                        .name("Mario")
+                        .lastName("Rossi")
+                        .build())
                 .build();
     }
 

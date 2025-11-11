@@ -12,6 +12,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class OrderResponseDto {
 
     private Long id;

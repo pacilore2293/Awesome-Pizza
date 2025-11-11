@@ -45,7 +45,7 @@ public class LoginErrorIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Utente non trovato per username"))
                 .andExpect(cookie().doesNotExist("refreshToken"));
 
-        this.loginUseCase.loginUnauthorizedAssertions("admin");
+        this.loginUseCase.loginUnauthorizedAssertions("admin", 0);
     }
 
     @Test
@@ -58,7 +58,7 @@ public class LoginErrorIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Credenziali non valide"))
                 .andExpect(cookie().doesNotExist("refreshToken"));
 
-        this.loginUseCase.loginUnauthorizedAssertions("admin");
+        this.loginUseCase.loginUnauthorizedAssertions("admin", 0);
     }
 
 }

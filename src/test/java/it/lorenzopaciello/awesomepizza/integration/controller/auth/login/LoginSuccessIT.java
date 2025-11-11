@@ -5,9 +5,7 @@ import it.lorenzopaciello.awesomepizza.integration.controller.auth.shared.LoginU
 import it.lorenzopaciello.awesomepizza.integration.controller.auth.shared.RegisterUseCase;
 import it.lorenzopaciello.awesomepizza.repository.RefreshTokenRepository;
 import it.lorenzopaciello.awesomepizza.repository.UserRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -16,8 +14,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-
 @Testcontainers
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LoginSuccessIT extends AbstractIntegrationTest {
 
     @Autowired
@@ -44,25 +42,37 @@ public class LoginSuccessIT extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("Login admin con credenziali corrette restituisce 200 con access token nel response body e refresh nel cookie httpOnly")
-    void loginAdminSuccess() throws Exception {
+    @Order(1)
+    @DisplayName("Primo login admin con credenziali corrette restituisce 200 con access token nel response body e refresh nel cookie httpOnly")
+    void loginAdmin1Success() throws Exception {
         ResultActions resultActions = this.loginUseCase.loginRequest("admin", "admin_pass", null, this.mockMvc);
-        this.loginUseCase.loginSuccessAssertions(resultActions, 1);
-        Thread.sleep(500);
+        this.loginUseCase.loginSuccessAssertions("admin", resultActions, 1);
+        Thread.sleep(1000);
     }
 
     @Test
+    @Order(2)
     @DisplayName("Login pizzaiolo dopo registrazione con credenziali corrette restituisce 200 con access token nel response body e refresh nel cookie httpOnly")
     void loginPizzaioloSuccess() throws Exception {
+
         ResultActions resultActionsLoginAdmin = this.loginUseCase.loginRequest("admin", "admin_pass", null, this.mockMvc);
-        this.loginUseCase.loginSuccessAssertions(resultActionsLoginAdmin, 1);
+        this.loginUseCase.loginSuccessAssertions("admin", resultActionsLoginAdmin, 2);
         String tokenAdmin = this.loginUseCase.loginSuccessGetToken(resultActionsLoginAdmin.andReturn());
 
         ResultActions resultActions = this.registerUseCase.RegisterRequest("pizzaiolo1", "admin_pass", "ROLE_PIZZAIOLO", tokenAdmin, null, this.mockMvc);
-        this.registerUseCase.registerSuccessAssertions(resultActions, "pizzaiolo1", "ROLE_PIZZAIOLO");
+        this.registerUseCase.registerSuccessAssertions(resultActions, "pizzaiolo1", "ROLE_PIZZAIOLO", 0);
 
         ResultActions resultActionsLoginPizzaiolo = this.loginUseCase.loginRequest("pizzaiolo1", "admin_pass", null, this.mockMvc);
-        this.loginUseCase.loginSuccessAssertions(resultActionsLoginPizzaiolo, 2);
+        this.loginUseCase.loginSuccessAssertions("pizzaiolo1", resultActionsLoginPizzaiolo, 1);
+        Thread.sleep(1000);
+    }
+
+    @Test
+    @Order(3)
+    @DisplayName("Secondo login admin con credenziali corrette restituisce 200 con access token nel response body e refresh nel cookie httpOnly")
+    void loginAdmin2Success() throws Exception {
+        ResultActions resultActions = this.loginUseCase.loginRequest("admin", "admin_pass", null, this.mockMvc);
+        this.loginUseCase.loginSuccessAssertions("admin", resultActions, 3);
     }
 
 }

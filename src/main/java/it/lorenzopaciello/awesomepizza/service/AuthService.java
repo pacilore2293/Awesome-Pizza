@@ -2,6 +2,7 @@ package it.lorenzopaciello.awesomepizza.service;
 
 import it.lorenzopaciello.awesomepizza.controller.dto.request.LoginRequestDto;
 import it.lorenzopaciello.awesomepizza.controller.dto.request.RegistrationRequestDto;
+import it.lorenzopaciello.awesomepizza.controller.dto.response.UserResponseDto;
 import it.lorenzopaciello.awesomepizza.exception.ErrorCode;
 import it.lorenzopaciello.awesomepizza.exception.custom.BadRequestException;
 import it.lorenzopaciello.awesomepizza.exception.custom.ConflictException;
@@ -107,7 +108,7 @@ public class AuthService implements AuthServiceInterface {
     }
 
     @Override
-    public User registerUser(RegistrationRequestDto registrationRequestDto) {
+    public UserResponseDto registerUser(RegistrationRequestDto registrationRequestDto) {
         if (userAuthRepository.findByUsername(registrationRequestDto.getUsername()).isPresent()) {
             throw new ConflictException(ErrorCode.USER_ALREADY_EXISTS_USERNAME);
         }
@@ -121,7 +122,8 @@ public class AuthService implements AuthServiceInterface {
         Role role = this.searchService.findRoleByName(registrationRequestDto.getRole());
         user.getRoles().add(role);
 
-        return userAuthRepository.save(user);
+        User savedUser = userAuthRepository.save(user);
+        return new UserResponseDto(savedUser);
     }
 
     @Override
