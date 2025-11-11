@@ -39,6 +39,11 @@ public class SecurityConfig {
                         // solo ADMIN può creare nuovi utenti (AL MOMENTO)
                         .requestMatchers(HttpMethod.POST, "/api/auth/register").hasRole("ADMIN")
 
+                        .requestMatchers(HttpMethod.PUT, "/api/order/taken").hasAnyRole("ADMIN", "PIZZAIOLO")
+                        .requestMatchers(HttpMethod.PUT, "/api/order/ready").hasAnyRole("ADMIN", "PIZZAIOLO")
+                        .requestMatchers(HttpMethod.PUT, "/api/order/escape").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/order/search").hasAnyRole("ADMIN", "PIZZAIOLO")
+
                         .anyRequest().authenticated()
                 )
                 //.userDetailsService(userDetailsService)

@@ -1,5 +1,6 @@
 package it.lorenzopaciello.awesomepizza.unit.service;
 
+import it.lorenzopaciello.awesomepizza.controller.dto.response.OrderResponseDto;
 import it.lorenzopaciello.awesomepizza.exception.ErrorCode;
 import it.lorenzopaciello.awesomepizza.exception.custom.NotFoundException;
 import it.lorenzopaciello.awesomepizza.model.Order;
@@ -45,7 +46,7 @@ public class OrderServiceTest {
             when(searchService.findPizzaById(requestBody.getOrder().get(0).getIdPizza())).thenReturn(PizzaUtils.getSinglePizzaId1());
             when(orderRepository.save(any())).thenReturn(OrderUtils.getOrderSingleEntity());
 
-            Order order = orderService.createOrder(requestBody);
+            OrderResponseDto order = orderService.createOrder(requestBody);
 
             assertNotNull(order);
 
@@ -63,7 +64,7 @@ public class OrderServiceTest {
             when(searchService.findPizzaById(requestBody.getOrder().get(1).getIdPizza())).thenReturn(PizzaUtils.getSinglePizzaId2());
             when(orderRepository.save(any())).thenReturn(OrderUtils.getOrderSingleEntity());
 
-            Order order = orderService.createOrder(requestBody);
+            OrderResponseDto order = orderService.createOrder(requestBody);
 
             assertNotNull(order);
 

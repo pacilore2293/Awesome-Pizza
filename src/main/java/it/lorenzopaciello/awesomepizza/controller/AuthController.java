@@ -26,6 +26,11 @@ public class AuthController {
         return ResponseEntity.ok(this.authService.login(request, response));
     }
 
+    @PutMapping(value = "/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, String>> refresh(@CookieValue(value = "refreshToken", required = false) String refreshToken, HttpServletResponse response) {
+        return ResponseEntity.ok(this.authService.refresh(refreshToken, response));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody @Valid RegistrationRequestDto request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.authService.registerUser(request));

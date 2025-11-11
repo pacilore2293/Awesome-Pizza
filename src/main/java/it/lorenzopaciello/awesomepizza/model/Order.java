@@ -1,9 +1,9 @@
 package it.lorenzopaciello.awesomepizza.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import it.lorenzopaciello.awesomepizza.model.enums.OrderActionEnum;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Check;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -32,13 +32,22 @@ public class Order {
     @Column(unique = true, updatable = false, nullable = false)
     private String code;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, optional = false)
+    @Column(name = "name", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderActionEnum status;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_user_guest", unique = true)
     private UserGuest guest;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private Set<PizzaOrder> pizzaOrders = new HashSet<>();
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @OrderBy("updatedAt DESC")
+    private Set<OrderAction> orderActions = new HashSet<>();
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

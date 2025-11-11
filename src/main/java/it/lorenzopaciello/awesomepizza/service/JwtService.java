@@ -4,7 +4,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import it.lorenzopaciello.awesomepizza.exception.ErrorCode;
+import it.lorenzopaciello.awesomepizza.exception.custom.NotFoundException;
 import it.lorenzopaciello.awesomepizza.service.interfaces.JwtServiceInterface;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -73,6 +77,17 @@ public class JwtService implements JwtServiceInterface {
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
+
+    public String extractBearerToken(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new NotFoundException(ErrorCode.AUTH_TOKEN_INVALID);
+        }
+
+        return authorizationHeader.substring(7);
+    }
+
 
     private boolean isTokenExpired(String token) {
         return extractAllClaims(token).getExpiration().before(new Date());

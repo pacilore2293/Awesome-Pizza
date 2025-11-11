@@ -113,6 +113,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isWhitelisted(String path) {
-        return SecurityWhitelist.PUBLIC_ENDPOINTS.stream().anyMatch(path::startsWith);
+        return SecurityWhitelist.PUBLIC_ENDPOINTS.stream().anyMatch(path::equalsIgnoreCase);
     }
 }

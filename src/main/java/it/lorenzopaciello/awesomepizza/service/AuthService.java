@@ -3,6 +3,7 @@ package it.lorenzopaciello.awesomepizza.service;
 import it.lorenzopaciello.awesomepizza.controller.dto.request.LoginRequestDto;
 import it.lorenzopaciello.awesomepizza.controller.dto.request.RegistrationRequestDto;
 import it.lorenzopaciello.awesomepizza.exception.ErrorCode;
+import it.lorenzopaciello.awesomepizza.exception.custom.BadRequestException;
 import it.lorenzopaciello.awesomepizza.exception.custom.ConflictException;
 import it.lorenzopaciello.awesomepizza.model.RefreshToken;
 import it.lorenzopaciello.awesomepizza.model.Role;
@@ -16,7 +17,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,7 +61,7 @@ public class AuthService implements AuthServiceInterface {
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
                 .httpOnly(true)
                 .secure(false)
-                .path("/api/auth/logout")
+                .path("/")
                 .maxAge(refreshExpirationMs)
                 .sameSite("Strict")
                 .build();
@@ -68,6 +71,39 @@ public class AuthService implements AuthServiceInterface {
         return Map.of(
                 "accessToken", accessToken
         );
+    }
+
+    @Override
+    public Map<String, String> refresh(String refreshTokenIn, HttpServletResponse response) {
+
+        if (refreshTokenIn == null) {
+            throw new BadRequestException(ErrorCode.AUTH_REFRESH_TOKEN_NOT_FOUND);
+        }
+
+        RefreshToken refreshToken = this.searchService.findRefreshTokenByToken(refreshTokenIn);
+
+        if (!refreshTokenService.validateRefreshToken(refreshToken)) {
+            User user = refreshToken.getUser();
+
+            String newAccessToken = jwtService.generateAccessToken(user);
+            RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user.getUsername());
+            refreshTokenService.revokeToken(refreshToken.getToken());
+
+            ResponseCookie cookie = ResponseCookie.from("refreshToken", newRefreshToken.getToken())
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/")
+                    .maxAge(refreshExpirationMs)
+                    .sameSite("Strict")
+                    .build();
+
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+            return Map.of("accessToken", newAccessToken);
+
+        }else{
+            throw new BadRequestException(ErrorCode.AUTH_TOKEN_INVALID);
+        }
     }
 
     @Override
@@ -92,23 +128,25 @@ public class AuthService implements AuthServiceInterface {
     @Transactional
     public Boolean logout(String refreshToken, HttpServletResponse response) {
 
-        String username = this.jwtService.extractUsername(refreshToken);
-        User user = (User) this.userDetailsService.loadUserByUsername(username);
-        user.setEnabled(false);
-        this.userAuthRepository.save(user);
+        if(refreshToken == null){
+            throw new BadRequestException(ErrorCode.AUTH_REFRESH_TOKEN_NOT_FOUND);
+        }else{
+            String username = this.jwtService.extractUsername(refreshToken);
+            User user = (User) this.userDetailsService.loadUserByUsername(username);
+            user.setEnabled(false);
+            this.userAuthRepository.save(user);
 
-        if (refreshToken != null) {
             refreshTokenService.revokeToken(refreshToken);
+
+            ResponseCookie clearedCookie = ResponseCookie.from("refreshToken", "")
+                    .httpOnly(true)
+                    .path("/")
+                    .maxAge(0)
+                    .build();
+
+            response.addHeader(HttpHeaders.SET_COOKIE, clearedCookie.toString());
+
+            return true;
         }
-
-        ResponseCookie clearedCookie = ResponseCookie.from("refreshToken", "")
-                .httpOnly(true)
-                .path("/")
-                .maxAge(0)
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, clearedCookie.toString());
-
-        return true;
     }
 }

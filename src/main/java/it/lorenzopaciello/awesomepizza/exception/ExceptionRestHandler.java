@@ -1,5 +1,6 @@
 package it.lorenzopaciello.awesomepizza.exception;
 
+import it.lorenzopaciello.awesomepizza.exception.custom.BadRequestException;
 import it.lorenzopaciello.awesomepizza.exception.custom.ConflictException;
 import it.lorenzopaciello.awesomepizza.exception.custom.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,26 +65,46 @@ public class ExceptionRestHandler {
     }
 
     @ExceptionHandler(LockedException.class)
-    public ResponseEntity<Map<String, String>> handleLocked(LockedException ex) {
+    public ResponseEntity<ResponseErrorDto> handleLocked(LockedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(Map.of(ErrorCode.AUTH_BLOCKED.getCode(), this.messageSource.getMessage(ErrorCode.AUTH_BLOCKED.getMessageKey(), null, LocaleContextHolder.getLocale())));
+                .body(ResponseErrorDto.builder()
+                        .code(ErrorCode.AUTH_BLOCKED.getCode())
+                        .message(this.messageSource.getMessage(ErrorCode.AUTH_BLOCKED.getMessageKey(), null, LocaleContextHolder.getLocale()))
+                        .build());
     }
 
     @ExceptionHandler(DisabledException.class)
-    public ResponseEntity<Map<String, String>> handleDisabled(DisabledException ex) {
+    public ResponseEntity<ResponseErrorDto>handleDisabled(DisabledException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(Map.of(ErrorCode.AUTH_DISABLED.getCode(), this.messageSource.getMessage(ErrorCode.AUTH_DISABLED.getMessageKey(), null, LocaleContextHolder.getLocale())));
+                .body(ResponseErrorDto.builder()
+                    .code(ErrorCode.AUTH_DISABLED.getCode())
+                    .message(this.messageSource.getMessage(ErrorCode.AUTH_DISABLED.getMessageKey(), null, LocaleContextHolder.getLocale()))
+                    .build());
     }
 
     //----- CUSTOM -----//
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleNotFound(NotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(ex.getErrorCode().getCode(), this.messageSource.getMessage(ex.getErrorCode().getMessageKey(), null, LocaleContextHolder.getLocale())));
+    public ResponseEntity<ResponseErrorDto>handleNotFound(NotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseErrorDto.builder()
+                .code(ex.getErrorCode().getCode())
+                .message(this.messageSource.getMessage(ex.getErrorCode().getMessageKey(), null, LocaleContextHolder.getLocale()))
+                .build());
     }
 
     @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<Map<String, String>> handleConflict(ConflictException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(ex.getErrorCode().getCode(), this.messageSource.getMessage(ex.getErrorCode().getMessageKey(), null, LocaleContextHolder.getLocale())));
+    public ResponseEntity<ResponseErrorDto> handleConflict(ConflictException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseErrorDto.builder()
+                .code(ex.getErrorCode().getCode())
+                .message(this.messageSource.getMessage(ex.getErrorCode().getMessageKey(), null, LocaleContextHolder.getLocale()))
+                .build());
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ResponseErrorDto> handleBadRequest(BadRequestException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseErrorDto.builder()
+                .code(ex.getErrorCode().getCode())
+                .message(this.messageSource.getMessage(ex.getErrorCode().getMessageKey(), null, LocaleContextHolder.getLocale()))
+                .build());
     }
 
     //----- GENRIC -----//

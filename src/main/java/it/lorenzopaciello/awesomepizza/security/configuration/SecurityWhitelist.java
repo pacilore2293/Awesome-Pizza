@@ -9,7 +9,8 @@ public class SecurityWhitelist {
             "/api/auth/refresh",
             "/api/auth/logout",
             "/api/pizzas",
-            "/api/order"
+            "/api/order",
+            "/api/order/detail"
     );
 
 }
